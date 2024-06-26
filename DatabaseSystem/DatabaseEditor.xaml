@@ -1,0 +1,93 @@
+<UserControl
+    x:Class="DatabaseSystem.DatabaseEditor"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+    xmlns:controls1="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:converters="using:CommunityToolkit.WinUI.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:DatabaseSystem"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:winUi="using:FluentIcons.WinUI"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <converters:BoolNegationConverter x:Key="BoolNegationConverter" />
+    </UserControl.Resources>
+    <NavigationView
+        IsBackButtonVisible="Collapsed"
+        IsSettingsVisible="False"
+        IsTitleBarAutoPaddingEnabled="True"
+        PaneDisplayMode="Top"
+        SelectionChanged="NavigationView_OnSelectionChanged">
+        <NavigationView.MenuItems>
+            <NavigationViewItem
+                x:Name="WorkerItem"
+                Content="工作人员"
+                Icon="{winUi:SymbolIcon Symbol=PersonAccounts}"
+                IsEnabled="{x:Bind IsWorker, Mode=OneWay}"
+                Tag="{x:Bind local:CollectionType.Worker}" />
+            <NavigationViewItem
+                Content="客户信息"
+                Icon="{winUi:SymbolIcon Symbol=Guest}"
+                IsEnabled="{x:Bind IsCustomer, Mode=OneWay}"
+                Tag="{x:Bind local:CollectionType.Customer}" />
+            <NavigationViewItem
+                Content="矿泉水库存"
+                Icon="{winUi:SymbolIcon Symbol=DrinkBottle}"
+                IsEnabled="{x:Bind IsAdmin, Mode=OneWay}"
+                Tag="{x:Bind local:CollectionType.MineralWater}" />
+            <NavigationViewItem
+                Content="供应商"
+                Icon="{winUi:SymbolIcon Symbol=VideoPersonCall}"
+                IsEnabled="{x:Bind IsSupplier, Mode=OneWay}"
+                Tag="{x:Bind local:CollectionType.Supplier}" />
+            <NavigationViewItem
+                Content="入库记录"
+                Icon="{winUi:SymbolIcon Symbol=Box}"
+                IsEnabled="{x:Bind Or(IsWorker, IsCustomer), Mode=OneWay}"
+                Tag="{x:Bind local:CollectionType.WaterInventoryRecord}" />
+            <NavigationViewItem
+                Content="送水记录"
+                Icon="{winUi:SymbolIcon Symbol=List}"
+                IsEnabled="{x:Bind Or(IsWorker, IsCustomer), Mode=OneWay}"
+                Tag="{x:Bind local:CollectionType.WaterDeliveryRecord}" />
+            <NavigationViewItem
+                Content="员工统计"
+                Icon="{winUi:SymbolIcon Symbol=DataPie}"
+                IsEnabled="{x:Bind IsWorker, Mode=OneWay}"
+                Tag="{x:Bind local:CollectionType.WorkerStatistics}" />
+            <NavigationViewItem
+                Content="前十用户统计"
+                Icon="{winUi:SymbolIcon Symbol=DataTrending}"
+                IsEnabled="{x:Bind IsCustomer, Mode=OneWay}"
+                Tag="{x:Bind local:CollectionType.CustomerRanking}" />
+        </NavigationView.MenuItems>
+        <NavigationView.FooterMenuItems>
+            <NavigationViewItem
+                Content="添加一条"
+                Icon="{winUi:SymbolIcon Symbol=Add}"
+                IsEnabled="{x:Bind IsNotAddable, Converter={StaticResource BoolNegationConverter}, Mode=OneWay}"
+                SelectsOnInvoked="False"
+                Tapped="AddButton_OnClick" />
+            <NavigationViewItem
+                Content="删除选择"
+                Icon="{winUi:SymbolIcon Symbol=Delete}"
+                IsEnabled="{x:Bind IsReadonly, Converter={StaticResource BoolNegationConverter}, Mode=OneWay}"
+                SelectsOnInvoked="False"
+                Tapped="DeleteButton_OnClick" />
+        </NavigationView.FooterMenuItems>
+        <controls:DockPanel>
+            <ContentDialog
+                x:Name="ConfirmDialog"
+                Title="删除已使用人员"
+                CloseButtonText="否"
+                Content="删除的人员已经存在于其他记录中，删除后会导致其他记录无法看到对应人员姓名，是否继续？"
+                PrimaryButtonText="是" />
+            <controls1:DataGrid
+                x:Name="DataGrid"
+                AutoGeneratingColumn="DataGrid_OnAutoGeneratingColumn"
+                IsReadOnly="{x:Bind IsReadonly, Mode=OneWay}"
+                RowEditEnded="DataGrid_OnRowEditEnded" />
+        </controls:DockPanel>
+    </NavigationView>
+</UserControl>

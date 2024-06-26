@@ -1,0 +1,16 @@
+<Window
+    x:Class="DatabaseSystem.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:DatabaseSystem"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+    <local:RootPanel
+        Id="{x:Bind local:App.AppViewModel.Id, Mode=OneWay}"
+        IsAdmin="{x:Bind local:App.AppViewModel.IsAdmin, Mode=OneWay}"
+        IsCustomer="{x:Bind local:App.AppViewModel.IsCustomer, Mode=OneWay}"
+        IsSupplier="{x:Bind local:App.AppViewModel.IsSupplier, Mode=OneWay}"
+        IsWorker="{x:Bind local:App.AppViewModel.IsWorker, Mode=OneWay}"
+        Window="{x:Bind}" />
+</Window>

@@ -1,0 +1,114 @@
+<controls:DockPanel
+    x:Class="DatabaseSystem.RootPanel"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+    xmlns:converters="using:CommunityToolkit.WinUI.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:DatabaseSystem"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:winUi="using:FluentIcons.WinUI"
+    Unloaded="RootPanel_OnUnloaded"
+    mc:Ignorable="d">
+    <controls:DockPanel.Resources>
+        <Style
+            x:Key="MyContentDialogStyle"
+            BasedOn="{StaticResource DefaultContentDialogStyle}"
+            TargetType="ContentDialog">
+            <Setter Property="PrimaryButtonText" Value="确定" />
+            <Setter Property="CloseButtonText" Value="取消" />
+            <Setter Property="DefaultButton" Value="Close" />
+        </Style>
+        <converters:BoolNegationConverter x:Key="BoolNegationConverter" />
+    </controls:DockPanel.Resources>
+    <controls:TitleBar
+        Title="送水系统"
+        controls:DockPanel.Dock="Top"
+        DisplayMode="Tall"
+        Icon="{winUi:SymbolIcon Symbol=DatabaseSwitch}"
+        Window="{x:Bind Window}">
+        <controls:TitleBar.Content>
+            <AutoSuggestBox
+                PlaceholderText="管理员密码"
+                QueryIcon="{winUi:SymbolIcon Symbol=Key,
+                                             FontSize=16}"
+                QuerySubmitted="AutoSuggestBox_OnQuerySubmitted" />
+        </controls:TitleBar.Content>
+        <controls:TitleBar.Footer>
+            <CommandBar
+                Margin="0,-4"
+                DefaultLabelPosition="Right"
+                OverflowButtonVisibility="Collapsed">
+                <AppBarButton
+                    Icon="{winUi:SymbolIcon Symbol=DatabaseArrowUp}"
+                    IsEnabled="{x:Bind IsAdmin, Mode=OneWay}"
+                    Label="备份"
+                    Tapped="Backup_OnTapped" />
+                <AppBarButton
+                    Icon="{winUi:SymbolIcon Symbol=DatabaseArrowDown}"
+                    IsEnabled="{x:Bind IsAdmin, Mode=OneWay}"
+                    Label="恢复"
+                    Tapped="Recover_OnTapped" />
+                <AppBarButton
+                    Icon="{winUi:SymbolIcon Symbol=BoxMultiple}"
+                    IsEnabled="{x:Bind Or(IsAdmin, IsWorker), Mode=OneWay}"
+                    Label="库存管理"
+                    Tag="{x:Bind StatisticsDialog}"
+                    Tapped="OpenDialog_OnTapped" />
+            </CommandBar>
+        </controls:TitleBar.Footer>
+    </controls:TitleBar>
+    <ContentDialog
+        x:Name="StatisticsDialog"
+        Title="新建库存条目"
+        IsEnabled="{x:Bind Or(IsAdmin, IsWorker), Mode=OneWay}"
+        IsPrimaryButtonEnabled="{x:Bind NewRecord.Validate, Mode=OneWay}"
+        Opened="ManageInventoryDialog_OnOpened"
+        PrimaryButtonClick="ManageInventoryDialog_OnPrimaryButtonClick"
+        Style="{StaticResource MyContentDialogStyle}">
+        <ScrollView>
+            <StackPanel Spacing="5">
+                <ToggleSwitch
+                    Header="出库或入库"
+                    IsOn="{x:Bind NewRecord.IsIncome, Mode=TwoWay}"
+                    OffContent="出库"
+                    OnContent="入库"
+                    Toggled="ToggleSwitch_OnToggled" />
+                <ComboBox
+                    HorizontalAlignment="Stretch"
+                    Header="员工"
+                    ItemsSource="{x:Bind NewRecord.Workers, Mode=OneWay}"
+                    SelectedItem="{x:Bind NewRecord.Worker, Mode=TwoWay}" />
+                <ComboBox
+                    HorizontalAlignment="Stretch"
+                    Header="矿泉水种类"
+                    ItemsSource="{x:Bind NewRecord.MineralWaters, Mode=OneWay}"
+                    SelectedItem="{x:Bind NewRecord.MineralWater, Mode=TwoWay}"
+                    SelectionChanged="Selector_OnSelectionChanged" />
+                <ComboBox
+                    HorizontalAlignment="Stretch"
+                    Header="顾客"
+                    IsEnabled="{x:Bind NewRecord.IsIncome, Converter={StaticResource BoolNegationConverter}, Mode=OneWay}"
+                    ItemsSource="{x:Bind NewRecord.Customers, Mode=OneWay}"
+                    SelectedItem="{x:Bind NewRecord.Customer, Mode=TwoWay}" />
+                <NumberBox
+                    Header="费用"
+                    Minimum="0"
+                    Value="{x:Bind NewRecord.Amount, Mode=TwoWay}" />
+                <NumberBox
+                    x:Name="QuantityNumberBox"
+                    Header="矿泉水数"
+                    Minimum="0"
+                    Value="{x:Bind NewRecord.Quantity, Mode=TwoWay}" />
+                <DatePicker Date="{x:Bind NewRecord.Time, Mode=TwoWay}" Header="日期" />
+            </StackPanel>
+        </ScrollView>
+    </ContentDialog>
+    <local:DatabaseEditor
+        x:Name="DatabaseEditor"
+        Id="{x:Bind Id, Mode=OneWay}"
+        IsAdmin="{x:Bind IsAdmin, Mode=OneWay}"
+        IsCustomer="{x:Bind IsCustomer, Mode=OneWay}"
+        IsSupplier="{x:Bind IsSupplier, Mode=OneWay}"
+        IsWorker="{x:Bind IsWorker, Mode=OneWay}" />
+</controls:DockPanel>
